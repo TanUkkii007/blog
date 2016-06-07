@@ -12,8 +12,13 @@
 
 Akkaの[Java Memory Model](http://doc.akka.io/docs/akka/2.4.7/general/jmm.html#Actors_and_the_Java_Memory_Model)のドキュメントにあるように、Akkaは可視性と順序問題に対し２つの"happens before"ルールを保証しています。
 
-- The actor send rule: アクターへのメッセージ送信は、そのアクターがそのメッセージを受信する前に起きる
-- The actor subsequent processing rule: アクターでのあるメッセージの処理は、そのアクターでの次のメッセージの前に起こる
+1. The actor send rule: アクターへのメッセージ送信は、そのアクターがそのメッセージを受信する前に起きる
+1. The actor subsequent processing rule: アクターでのあるメッセージの処理は、そのアクターでの次のメッセージの処理の前に起こる
 
+この２つのルールを保証しているコンポーネントはメールボックスだ。
+
+１つ目のルールは、メールボックスの`MessageQueue`の実装によって達成できる。アンバウンデッドメールボックスの場合`ConcurrentLinkedQueue`を使うことでvolatile writeを行い、バウンデッドメールボックスの場合は`LinkedBlockingQueue`を使うことでロックを行う。これによってメッセージの送信は、そのメッセージの処理の前に起きていることが観測できる。
+
+２つ目のルールは、メールボックスのステータス管理によって実現している。メッセージを処理し終えたあと、メールボックスはアイドル状態になる[Mailbox.scala#L227](https://github.com/akka/akka/blob/v2.4.7/akka-actor/src/main/scala/akka/dispatch/Mailbox.scala#L227)。これは`sun.misc.Unsafe.compareAndSwapInt`を使っており、volatile writeである[Mailbox.scala#L129-L130](https://github.com/akka/akka/blob/v2.4.7/akka-actor/src/main/scala/akka/dispatch/Mailbox.scala#L129-L130)。メッセージを処理し始める時、メールボックスのステータスを確認する[Mailbox.scala#L222](https://github.com/akka/akka/blob/v2.4.7/akka-actor/src/main/scala/akka/dispatch/Mailbox.scala#L222)。これは内部で`sun.misc.Unsafe.getIntVolatile`を行っており、volatile readである[Mailbox.scala#L111](https://github.com/akka/akka/blob/v2.4.7/akka-actor/src/main/scala/akka/dispatch/Mailbox.scala#L111)。これにより以前のメッセージ処理時に行った書き込みは同期され、次のメッセージを処理するときに観測できることが保証される。
 
 僕は@yoskhdiaさんに質問されるまで@volatile
