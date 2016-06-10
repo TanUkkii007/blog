@@ -34,3 +34,17 @@
 
 ### 2.2 Interface
 
+- reate
+- delete
+- open
+- close
+- read
+- write
+- snapshot
+- record append (アトミック性を保ちながら複数のクライアントが同じファイルに追記する操作。multi-way mergeやproduce-consumerキューを実装するときに使う)
+
+### 2.3 Architecture
+
+
+
+
