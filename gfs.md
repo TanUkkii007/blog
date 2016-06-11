@@ -45,6 +45,17 @@
 
 ### 2.3 Architecture
 
+１つのmasterと複数のchunkserverから成る。
 
+ファイルは固定長のchunkに分割される。chunkはイミュータブルでグローバルに一意な64bitのchunk handleで識別される。ChunkserverはchunkをLinuxファイルとしてローカルのディスクに保存し、chunk handleとbyte rangeを与えられて読み書きする。chunkは複数のchunkserverにレプリケートされる。
+
+masterはすべてのファイルシステムのメタデータを管理する。たとえばnamespace, access control, mapping from files to chunks, current location of chunksを管理する。
+chunk lease management, 迷子chunkのガーベッジコレクション、chunkserver間のchunkのマイグレーションなどシステムワイドなアクティビティも管理する。masterはchunkserverと定期的にHeartBeatメッセージを送って命令を送ったり状態を収集したりする。
+
+クライアントはメタデータ操作はmasterとやりとりするが、データは直接chunkserverとやりとりする。POSIX APIは実装していないのでLinuxのvnodeレイヤーはフックする必要がない。
+
+クライアントもchunkserverもファイルデータをキャッシュしない。クライアントやシステムのキャッシュを実装しないことによって、キャッシュのコヒーレンス問題を考える必要がなく単純化できる（ただしクライアントはメタデータをキャッシュしている）。chunkはローカルのファイルとして保存されており、アクセス頻度の高いものはLinuxのバッファーキャッシュでメモリーに保持されるので、chunkserverはキャッシュを実装する必要はない。
+
+### 2.4 Single Master
 
 
