@@ -58,4 +58,12 @@ chunk lease management, 迷子chunkのガーベッジコレクション、chunks
 
 ### 2.4 Single Master
 
+single master をもつことはchunkの配置やレプリケーションの決定を単純にする。しかしボトルネックにならないようreadとwriteへの関与を最小化しなければならない。クライアントはmasterからファイルを読み書きしない。その代わりクライアントはどのchunkserverとコンタクトをとるか尋ねる。クライアントは情報を一定期間キャッシュし直接chunkserverを操作する。
+
+Figure 1を説明する。クライアントは固定長のchunkサイズを使い、ファイル名とバイトオフセットをファイルのchunkインデックスに変換する。次にmasterにファイル名とchunk indexを含んだリクエストを送る。masterはchunk handleとレプリカの場所を返す。クライアントはこの情報をキャッシュしファイル名とインデックスをキーにする。クライアントは（最も近いだろう）レプリカの１つにリクエストを送る。リクエストはchunk handleとchunk中のbyte範囲を指定する。同一のchunkの後続の読み込みはキャッシュが切れるかファイルが再度openにならないかぎりmasterとのやりとりは必要ない。実際にはクライアントはおなじリクエストで複数のchunkを要求するから、masterは後続のchunkの情報を含めて返す。この追加情報は将来のmasterとのやりとりのコストを下げる。
+
+
+### 2.5 Chunk Size
+
+
 
