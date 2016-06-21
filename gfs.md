@@ -78,6 +78,50 @@ Figure 1を説明する。クライアントは固定長のchunkサイズを使�
 
 ### 2.6 Metadata
 
+masterサーバーは３つのメタデータを保持する
+1. ファイルとchunkの名前空間
+2. ファイルからchunkへのマッピング
+3. chunkのレプリカの場所
 
+名前空間とファイルからchunkへのマッピングへの変更はディスクにoperation log として永続化される。これによってmasterがクラッシュしても不整合な状態にならない。
+
+masterはchunkの場所を永続化しない。その代わり起動時やchunkserverがクラスターに参加したときにchunkserevrに尋ねる。
+
+
+#### 2.6.1 In-Memory Data Structures
+
+メタデータはmasterのメモリーにあるため、masterの操作は高速。
+
+定期スキャンも高速
+- chunk garbage collection
+- chunkserver障害時のre-replication
+- リバランスのためのchunkのマイグレーション
+
+メタデータはmasterのメモリーにあるため、クラスターのキャパシティはmasterのメモリー量に制限される
+
+しかし大した制限ではない
+- 64Mb chunkにつき64byteのメタデータ
+- ファイルの名前空間はファイルにつき64byte以下
+
+
+#### 2.6.2 Chunk Locations
+
+masterはどのchunkserverがchunkをもっているかという情報を永続化しない。それは起動時にchunkserverから取得する。その後はmasterがchunkの場所を決定できる、かつchunkserverのHeartBeatを監視しているので、状態を完全に同期できる。
+
+永続化しないことによって、chunkserverがクラスターに参加したり去ったり名前が変更されたり障害が起きたり再起動した時に、masterが状態を同期するさいの問題を消しされる。数百台のノードがあるとこれらは頻繁におきる。
+
+masterではなくchunkserverが自身のディスク上のchunkの情報に責任をもつことにより、chunkserevrのディスク障害時やオペレーターが名前を変更したときにmasterの状態をなんとか整合性をもって同期する必要がない。
+
+
+#### 2.6.3 Operation Log
+
+operation logはmasterのmetaデータの変更履歴となる。masterの唯一の永続データであるとともに、変更操作の順番を決定する。ファイルとchunkとそのバージョンは論理時間でユニークに識別できる。
+
+operation logは非常に重要で、失うとクライアントの操作やファイルシステム全体を消失する。そのためlogをレプリケートしてローカルとリモートのディスクにフラッシュしてからクライアントにレスポンスを返す。
+
+masterはファイルシステムの状態はoperation logをリプレイすることで復旧する。復旧を迅速にするため、logのサイズが大きくなると最新のcheckpointを読み込みその後のlogのみをリプレイすればいいようにする。
+
+
+### 2.7 Consistency Model
 
 
