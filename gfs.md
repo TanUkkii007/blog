@@ -166,6 +166,16 @@ GFSはこれを以下の方法で実現している
 
 #### 2.7.2 Implications for Applications
 
+GFSはシンプルな技術でのゆるい整合性を受け入れている。
+
+- 上書きではなく追記
+- checkpointing
+- self-validating
+- self-identifying
+
+追記は効率がよく耐障害性が高い。
+checkpointingではwriterがインクリメンタルに再開でき、readerがまだ書き終わってないデータを処理することを防いでくれる。
 
 
+### 3. SYSTEM INTERACTIONS
 
