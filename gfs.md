@@ -179,3 +179,25 @@ checkpointingではwriterがインクリメンタルに再開でき、readerが�
 
 ### 3. SYSTEM INTERACTIONS
 
+#### 3.1 Leases and Mutation Order
+
+レプリカ間の整合性のある変更を行うためにchunkのリースを使う。masterはレプリカの１つにchunkのリースを与える。そのレプリカを *primary* と呼ぶ。primaryはchunkのすべての変更への順序を選ぶ。なのでグローバルな変更順序はmasterに選ばれたリース貸与順序と、リースの中ではprimaryが与えた順番によって定義される。
+
+masterがprimaryとの通信を失っても、古いリースが期限切れになったら他のレプリカが
+リースを得る。
+
+Figure 2で書き込みのプロセスを示す。
+
+1. クライアントはどのchunkserverがchunkのリースをもっていて、他のレプリカがどこにいるのか聞く
+2. masterはprimaryとsecondaryレプリカの場所を返す。クライアントはそれをキャッシュする。
+3. クライアントはすべてのレプリカにデータをプッシュする。順番は問わない。各chunkserverはLRUバッファーキャッシュに書き込む。
+4. すべてのレプリカがデータを受け取りAckを返したら、クライアントはwriteリクエストをprimaryに送る。primaryは（他のクライアントのものも含め）受け取ったすべての変更操作に順番をつける。その順番で変更を適用し内部状態を変える。
+5. primaryはwriteリクエストをすべてのsecondaryレプリカにフォワードする。secondaryはprimaryが決めた順番どおりに変更を適用する。
+6. secondaryは変更が完了したらprimaryに通知する
+7. primaryはクライアントにレスポンスを返す。レプリカでおきたエラーはクライアントに報告される。このときsecondaryで書き込みが失敗しているかもしれないが、primaryでは成功している。なぜならprimaryで失敗したら順序が決定できずsecondaryにフォワードできないからだ。このときファイル領域はinconsistentとなり、リクエストはエラーとなる。
+
+クライアントの操作は並列に起きるかもしれない。なので共有されたファイル領域はundefinedだが、すべてのレプリカで変更は同じ順番で起きており、結果は同一となるのでconsistentである。
+
+
+#### 3.2 Data Flow
+
