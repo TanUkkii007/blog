@@ -314,5 +314,14 @@ chunkの名前空間のスキャン時にmasterは迷子chunkを特定し、そ�
 
 #### 4.5 Stale Replica Detection
 
+chunkserverがダウンしている間変更を逃した時、chunkレプリカのデータは古くなる。古いデータかどうか判断するために、各chunkに対してmasterはchunk version numberを管理している。
+
+masterがchunkのリースを認めるたびに、chunkのバージョンを上げて、最新のレプリカに通知する。他のレプリカが利用不可能になっているときは、chunkのバージョン番号は上がらない。chunkserverが再起動してもっているchunkの集合とそのバージョンを報告してきたときに、masterはそのchunkが古いかどうか判定する。そのchunkよりも大きなバージョンを知っていた場合、ダウンしていたと判断して最新に更新する。
+
+masterがガーベッジコレクションで古いレプリカを削除する。それまではその古いレプリカは存在しないものとしてclientへのレスポンスを返す。さらなるセーフガードとして、masterはクライアントやchunkserverにどのchunkserverがchunkのリースをもっているか教えるときにchunkバージョンも教える。クライアントやchunkserverはバージョンを確認して最新のデータかどうかチェックする。
+
+
+## 5. FAULT TOLERANCE AND DIAGNOSIS
+
 
 
