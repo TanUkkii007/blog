@@ -51,13 +51,41 @@ $P(O|\lambda) = \sum_{q}P(O,q|\lambda)$ //加法定理
 
 $ = \sum_{q}P(O|q,\lambda)P(q|\lambda)$ //乗法定理
 
-$ = \sum_{q}\prod_{t=1}^Ta_{q_{t-1}q_t}b_{q_t}(o_t)$
+$ = \sum_{q}\prod_{t=1}^Ta_{q_{t-1}q_t}b_{q_t}(o_t)$ (1.13)
 
 状態列が格子状*だと考えると、$\forall t \in [1,T]$に対して観測列の確率はこのように変換できる。
 
 *(Figure1.1のような状態遷移図を時間方向に展開すると格子状になる。そのように図示したものをトレリス図という。)
 
+$P(O|\lambda) = \sum_{i=1}^NP(O, q_t = i|\lambda)$ //加法定理
+
+$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t, o_{t+1}, ..., o_T, q_t = i|\lambda)$
+
 $P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$
+
+ゆえに観測列の確率(1.13)はフォワード・バックワード確率をつかって効率的に計算できる。
+
+$\alpha_t(i) = P(o_1,o_2,...,o_t,q_t=i|\lambda)$
+
+$\beta_t(i) = P(o_{t+1},o_{t+2},...,o_T|q_t=i,\lambda)$
+
+フォワード・バックワード確率は以下のように再帰的に計算できる
+
+1 初期化
+
+$\alpha_1(i) = \pi_ib_i(o_1)$ $1 \le i \le N$
+
+$\beta_T(i) = 1$ $1 \le i \le N$
+
+2 再帰
+
+$\alpha_{t+1} = [\sum_{j=1}^{N}\alpha_t(j)a_{ij}]b_i(o_{t+1})$ $1 \le i \le N, t=2,...,T$
+
+$\beta_t(i) = \sum_{j=1}^Na_{ij}b_j(o_{t+1})\beta_{t+1}(j)$$1 \le i \le N, t=T-1,...,1$
+
+よって$\forall t \in [1,T]$に対して$P(O|\lambda)$は
+
+$P(O|\lambda) = \sum_{i=1}^{N}\alpha_t(i)\beta_t(i)$
 
 --------------------------------
 
@@ -104,3 +132,6 @@ $P(x_1,x_2|x_3) = P(x_1|x_2,x_3)P(x_2|x_3)$
 $P(x_1,x_2,x_3,x_4) = P(x_2,x_3,x_4|x_1)P(x_1)$
 $ = P(x_3,x_4|x_1,x_2)P(x_2|x_1)P(x_1)$
 $ = P(x_4|x_1,x_2,x_3)P(x_3|x_1,x_2)P(x_2|x_1)P(x_1)$
+
+
+## 1.2 Optimal State Sequence
