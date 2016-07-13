@@ -51,11 +51,13 @@ $P(O|\lambda) = \sum_{q}P(O,q|\lambda)$ //加法定理
 
 $ = \sum_{q}P(O|q,\lambda)P(q|\lambda)$ //乗法定理
 
-$ = \sum_{q}\prod_{t=1}^Ta_{q_{t-1}q_t}b_{q_t}(o_t)$ (1.13)
+$ = \sum_{q}\prod_{t=1}^Ta_{q_{t-1}q_t}b_{q_t}(o_t)$ (1.13)*
 
-状態列が格子状*だと考えると、$\forall t \in [1,T]$に対して観測列の確率はこのように変換できる。
+*(この式は現実的に計算できない。計算量は$2TN^T$になる。各$q_1,...,q_T$にはN個のとりうる状態があり、$\sum_{q}$で$N^T$の計算量がある。さらに$\sigma$の中では$2T$個の掛け算がある。)
 
-*(Figure1.1のような状態遷移図を時間方向に展開すると格子状になる。そのように図示したものをトレリス図という。)
+状態列が格子状**だと考えると、$\forall t \in [1,T]$に対して観測列の確率はこのように変換できる。
+
+**(Figure1.1のような状態遷移図を時間方向に展開すると格子状になる。そのように図示したものをトレリス図という。)
 
 $P(O|\lambda) = \sum_{i=1}^NP(O, q_t = i|\lambda)$ //加法定理
 
@@ -66,6 +68,8 @@ $P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_
 ゆえに観測列の確率(1.13)はフォワード・バックワード確率をつかって効率的に計算できる。
 
 $\alpha_t(i) = P(o_1,o_2,...,o_t,q_t=i|\lambda)$
+
+$\alpha_t(i)$は$\lambda$が与えられた時の状態i、時間tにおける$o_1,o_2,...,o_t$までの部分観測列の確率
 
 $\beta_t(i) = P(o_{t+1},o_{t+2},...,o_T|q_t=i,\lambda)$
 
@@ -86,6 +90,8 @@ $\beta_t(i) = \sum_{j=1}^Na_{ij}b_j(o_{t+1})\beta_{t+1}(j)$$1 \le i \le N, t=T-1
 よって$\forall t \in [1,T]$に対して$P(O|\lambda)$は
 
 $P(O|\lambda) = \sum_{i=1}^{N}\alpha_t(i)\beta_t(i)$
+
+![フォワード確率の再帰的計算方法](https://github.com/TanUkkii007/blog/blob/master/img/HMM_forward_probability.png)
 
 --------------------------------
 
