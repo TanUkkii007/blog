@@ -141,3 +141,42 @@ $ = P(x_4|x_1,x_2,x_3)P(x_3|x_1,x_2)P(x_2|x_1)P(x_1)$
 
 
 ## 1.2 Optimal State Sequence
+
+与えられた観測列$O = (o_1,o_2,...,o_T)$における最良の状態列$q^* = (q^*_1,q^*_2,...,q^*_T)$も様々なアプリケーションで有用である。例えば音声認識システムでは観測列ともっともとりうる状態列の同時確率を$P(O|\lambda)$を推定するためにつかう。
+
+$P(O|\lambda) = \sum_qP(O,q|\lambda)$ //加法定理
+
+$ \simeq max_qP(O,q|\lambda)$
+
+最良の状態列$q^* = argmax_qP(O,q|\lambda)$はViterbiアルゴリズムとよばれる動的計画法に似た手法で計算できる。
+
+$\delta_t(i)$を時間tのときに状態iで終わるもっともとりうる状態列とする。
+
+$\delta_t(i) = max_{q_1,q_2,...,q_{t-1}}P(o_1,...,o_t,q_1,...,q_{t-1},q_t=i|\lambda)$
+
+そして$\psi_t(i)$をそれを追跡する配列とする。これらを用いてViterbiアルゴリズムは以下のように書ける。
+
+1 初期化
+
+$\delta_1(i) = \pi_ib_i(o_1)$  $1 \le i \le N$
+
+$\psi_1(i) = 0$  $1 \le i \le N$
+
+2 再帰
+
+$\delta_t(j) = max_i[\delta_t(i)a_{ij}]o_t$  $1 \le i \le N, t=2,...,T$
+
+$\psi_t(j) = argmax_i[\delta_t(i)a_{ij}]$  $1 \le i \le N, t=2,...,T$
+
+3 終了
+
+$P(O,q^*|\lambda) = max_i[\delta_T(i)]$
+
+$q^*_T = argmax_i[\delta_T(i)]$
+
+4 パスの引き返し
+
+$q^*_t = \psi_{t+1}(q^*_{t+1})$
+
+
+## 1.3 Parameter Estimation
