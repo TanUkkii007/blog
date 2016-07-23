@@ -63,7 +63,9 @@ $P(O|\lambda) = \sum_{i=1}^NP(O, q_t = i|\lambda)$ //加法定理
 
 $P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t, o_{t+1}, ..., o_T, q_t = i|\lambda)$
 
-$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$
+$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|o_1,o_2,...,o_t,q_t=i,\lambda)$ //乗法定理
+
+$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$ //$o_{t+1},...,o_T$は$o_1,o_2,...,o_t$と独立
 
 ゆえに観測列の確率(1.13)はフォワード・バックワード確率をつかって効率的に計算できる。
 
@@ -92,6 +94,8 @@ $\beta_t(i) = \sum_{j=1}^Na_{ij}b_j(o_{t+1})\beta_{t+1}(j)$$1 \le i \le N, t=T-1
 $P(O|\lambda) = \sum_{i=1}^{N}\alpha_t(i)\beta_t(i)$
 
 ![フォワード確率の再帰的計算方法](https://github.com/TanUkkii007/blog/blob/master/img/HMM_forward_probability.png)
+
+![バックワード確率の再帰的計算方法](https://github.com/TanUkkii007/blog/blob/master/img/HMM_backward_probability.png)
 
 --------------------------------
 
@@ -138,6 +142,19 @@ $P(x_1,x_2|x_3) = P(x_1|x_2,x_3)P(x_2|x_3)$
 $P(x_1,x_2,x_3,x_4) = P(x_2,x_3,x_4|x_1)P(x_1)$
 $ = P(x_3,x_4|x_1,x_2)P(x_2|x_1)P(x_1)$
 $ = P(x_4|x_1,x_2,x_3)P(x_3|x_1,x_2)P(x_2|x_1)P(x_1)$
+
+--------------------------------
+
+確率の独立性
+
+乗法定理ではXとYの同時確率は以下となった。
+
+$p(X,Y) = p(Y|X)p(X)$
+
+
+XとYが独立のとき、$P(Y|X) = P(Y)$となる。よって、
+
+$p(X,Y) = p(Y)p(X)$
 
 
 ## 1.2 Optimal State Sequence
