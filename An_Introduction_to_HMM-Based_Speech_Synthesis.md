@@ -210,11 +210,32 @@ $q^*_t = \psi_{t+1}(q^*_{t+1})$ t = T-1, T-2,...,1
 $\lambda^* = argmax_{\lambda}P(O|\lambda)$
 $ = argmax_{\lambda}\sum_{q}P(O,q|\lambda)$ //加法定理
 
-この問題は隠れ変数qを含み不完全なデータからの最適化問題のため、与えられた観測列Oのための尤度P(O|\lambda)をグローバルに最大化する$\lambda^*$を閉形式で求めるのは難しい。
+この問題は隠れ変数qを含み不完全なデータからの最適化問題のため、与えられた観測列Oのための尤度$P(O|\lambda)$をグローバルに最大化する$\lambda^*$を閉形式で求めるのは難しい。
 
 しかしながらローカルに$P(O|\lambda)$を最大化するパラメーター$\lambda$を得るのは完全なデータセットの最適化を行えるEMアルゴリズムのような手法で得られる。この最適化アルゴリズムはよくBaum-Welchアルゴリズムと呼ばれる。
 
 以下の節でガウス分布を用いたCD-HMMのEMアルゴリズムを解説する。離散分布や混合ガウス分布のEMアルゴリズムも自明に導かれる。
 
 ### 1.3.1 Auxiliary Function Q
+
+EMアルゴリズムでは、現在のパラメーターセット$\lambda'$と新しいパラメーターセット$\lambda$の補助関数$Q(\lambda',\lambda)$を以下のように定義する。
+
+$Q(\lambda',\lambda) = \sum_{q}P(q|O,\lambda')logP(O,q|\lambda)$
+
+各イテレーションで、現在のパラメーターセット$\lambda'$は$Q(\lambda',\lambda)$を最大化する新しいパラメーターセット$\lambda$に置き換える。このイテレーション手続きは尤度$P(O|\lambda)$を単調増加させある極限に到達することを証明できる。なぜならQ関数は以下の定理を満たすからである。
+
+- 定理１
+
+$Q(\lambda',\lambda) \ge Q(\lambda',\lambda') \Rightarrow P(O|\lambda) \ge P(O|\lambda')$
+
+- 定理２
+補助関数$Q(\lambda',\lambda)$は$\lambda$の関数として唯一のグローバルな最大値をもつ。この最大値は唯一の極大点である。
+
+- 定理３
+もしパラメーターセット$\lambda$がQの極点なら、かつその場合に限り、それは尤度$P(O|\lambda)$の極点である。
+
+
+### 1.3.2 Maximization of Q-Function
+
+
 
