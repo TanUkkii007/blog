@@ -110,7 +110,7 @@ XとYが同時に起きるということは、「Xがおきて、さらにXが�
 
 $p(Y|X)p(X) = p(X|Y)p(Y)$
 
-$p(Y|X) = \frac{p(X|Y)p(Y)}{p(x)}$
+$p(Y|X) = \frac{p(X|Y)p(Y)}{p(X)}$
 
 これをベイズの定理という。
 
@@ -159,19 +159,25 @@ $p(X,Y) = p(Y)p(X)$
 
 ## 1.2 Optimal State Sequence
 
-与えられた観測列$O = (o_1,o_2,...,o_T)$における最良の状態列$q^* = (q^*_1,q^*_2,...,q^*_T)$も様々なアプリケーションで有用である。例えば音声認識システムでは観測列ともっともとりうる状態列の同時確率を$P(O|\lambda)$を推定するためにつかう。
+与えられた観測列$O = (o_1,o_2,...,o_T)$におけるもっともとりうる状態列$q^* = (q^*_1,q^*_2,...,q^*_T)$も様々なアプリケーションで有用である。例えば音声認識システムでは観測列ともっともとりうる状態列の同時確率$P(O,p^*|\lambda)$を$P(O|\lambda)$を推定するためにつかう。
 
 $P(O|\lambda) = \sum_qP(O,q|\lambda)$ //加法定理
 
 $ \simeq max_qP(O,q|\lambda)$
 
-最良の状態列$q^* = argmax_qP(O,q|\lambda)$はViterbiアルゴリズムとよばれる動的計画法に似た手法で計算できる。
+最もとりうる状態列$q^* = argmax_qP(O,q|\lambda)$*はViterbiアルゴリズムとよばれる動的計画法に似た手法で計算できる。
 
-$\delta_t(i)$を時間tのときに状態iで終わるもっともとりうる状態列とする。
+*(もっともとりうる状態列は$argmax_qP(q|O,\lambda)$を求めることで得られる。$argmax_qP(O,q|\lambda)$を求めることは$argmax_qP(q|O,\lambda)$を求めることと等しい。なぜなら、
+$P(q|O,\lambda)P(O|\lambda) = P(O,q|\lambda)$ //乗法定理
+$P(q|O,\lambda) = \frac{P(O,q|\lambda)}{P(O|\lambda)}$
+$ =  \frac{P(O,q|\lambda)}{\sum_qP(O,q|\lambda)}$ //加法定理
+)
+
+$\delta_t(i)$を時間tのときに状態iで終わるもっともとりうる状態列の確率とする。
 
 $\delta_t(i) = max_{q_1,q_2,...,q_{t-1}}P(o_1,...,o_t,q_1,...,q_{t-1},q_t=i|\lambda)$
 
-そして$\psi_t(i)$をそれを追跡する配列とする。これらを用いてViterbiアルゴリズムは以下のように書ける。
+そして$\psi_t(i)$をもっともとりうる状態を追跡する配列とする(各tとjに対し$\delta_t(j)$を最大化する状態i)。これらを用いてViterbiアルゴリズムは以下のように書ける。
 
 1 初期化
 
@@ -181,9 +187,9 @@ $\psi_1(i) = 0$  $1 \le i \le N$
 
 2 再帰
 
-$\delta_t(j) = max_i[\delta_t(i)a_{ij}]o_t$  $1 \le i \le N, t=2,...,T$
+$\delta_t(j) = max_i[\delta_{t-1}(i)a_{ij}]o_t$  $1 \le i \le N, t=2,...,T$
 
-$\psi_t(j) = argmax_i[\delta_t(i)a_{ij}]$  $1 \le i \le N, t=2,...,T$
+$\psi_t(j) = argmax_i[\delta_{t-1}(i)a_{ij}]$  $1 \le i \le N, t=2,...,T$
 
 3 終了
 
@@ -191,10 +197,11 @@ $P(O,q^*|\lambda) = max_i[\delta_T(i)]$
 
 $q^*_T = argmax_i[\delta_T(i)]$
 
-4 パスの引き返し
+4 パスの引き返し（現在のもっともとりうる状態から過去のもっともとりうる状態をたどる）
 
-$q^*_t = \psi_{t+1}(q^*_{t+1})$
+$q^*_t = \psi_{t+1}(q^*_{t+1})$ t = T-1, T-2,...,1
 
+(Viterbiアルゴリズムはパスの引き返しを除けばフォーワード確率を求める手順に似ている。合計を使う代わりに最大値をとっている。)
 
 ## 1.3 Parameter Estimation
 
