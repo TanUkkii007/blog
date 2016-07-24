@@ -16,18 +16,18 @@ $\lambda = (A,B,\Pi)$
 
 状態$i$の観測データ$o$の出力確率分布$b_i(o)$は連続でも離散でもよい。連続分布の場合、出力確率分布はよく多変数混合ガウス分布でモデリングする。
 
-$b_i(o) = \sum_{m=1}^Mw_{im}N(o;\mu_{im},\Sigma_{im})$
+$b_i(o) = \sum_{m=1}^Mw_{im}\mathcal{N}(o;\mu_{im},\Sigma_{im})$
 
 $M$は分布の混合コンポーネントの数、$w_{im}$、$\mu_{im}$、$\sum_{im}$は重み、L次元平均ベクトル、$L \times L$次元の共分散行列。
 
-各コンポーネントのガウス分布$N(o;\mu_{im},\Sigma_{im})$の定義は以下である。
+各コンポーネントのガウス分布$\mathcal{N}(o;\mu_{im},\Sigma_{im})$の定義は以下である。
 
-$N(o;\mu_{im},\Sigma_{im}) = \frac{1}{\sqrt{(2\pi)^L|\Sigma_{ims}|}}exp(-\frac{1}{2}(o-\mu_{im})^\top\Sigma_{im}^{-1}(o-\mu_{im}))$
+$\mathcal{N}(o;\mu_{im},\Sigma_{im}) = \frac{1}{\sqrt{(2\pi)^L|\Sigma_{ims}|}}exp(-\frac{1}{2}(o-\mu_{im})^\top\Sigma_{im}^{-1}(o-\mu_{im}))$
 
 観測ベクトル$o_t$が互いに独立なデータストリームに分解できるなら、つまり$o = [o_1^\top, o_2^\top, ..., o_S^\top]^\top$なら、$b_i(o)$は混合ガウス分布の密度の積になる。
 
 $b_i(o) = \prod_{s=1}^Sb_{is}(o_s)$
-$ = \prod_{s=1}^S[\sum_{m=1}^{M_s}w_{ism}N(o_s;\mu_{ism},\Sigma_{ism})]$
+$ = \prod_{s=1}^S[\sum_{m=1}^{M_s}w_{ism}\mathcal{N}(o_s;\mu_{ism},\Sigma_{ism})]$
 
 $M_s$はストリームs中のコンポーネント数、$w_{ism}$、$\mu_{ism}$、$\sum_{ism}$はストリームsの状態iのコンポーネントmの重み、L次元平均ベクトル、$L \times L$次元の共分散行列。
 
@@ -220,7 +220,7 @@ $ = argmax_{\lambda}\sum_{q}P(O,q|\lambda)$ //加法定理
 
 EMアルゴリズムでは、現在のパラメーターセット$\lambda'$と新しいパラメーターセット$\lambda$の補助関数$Q(\lambda',\lambda)$を以下のように定義する。
 
-$Q(\lambda',\lambda) = \sum_{q}P(q|O,\lambda')logP(O,q|\lambda)$
+$Q(\lambda',\lambda) = \sum_{q}P(q|O,\lambda')logP(O,q|\lambda)$ (1.34)
 
 各イテレーションで、現在のパラメーターセット$\lambda'$は$Q(\lambda',\lambda)$を最大化する新しいパラメーターセット$\lambda$に置き換える。このイテレーション手続きは尤度$P(O|\lambda)$を単調増加させある極限に到達することを証明できる。なぜならQ関数は以下の定理を満たすからである。
 
@@ -237,5 +237,36 @@ $Q(\lambda',\lambda) \ge Q(\lambda',\lambda') \Rightarrow P(O|\lambda) \ge P(O|\
 
 ### 1.3.2 Maximization of Q-Function
 
+式(1.13)を使うと、$P(O,q|\lambda)$の対数尤度は以下のように書ける。
+
+$\log{P(O,q|\lambda)} = \sum_{t=1}^T\log{a_{q_{t-1}q_t}} + \sum_{t=1}^T\log\mathcal{N}(o_t;\mu_{q_t},\Sigma_{q_t})$
+
+ここで$a_{q_0q_1}$を$\pi_{q_1}$と表す。Q関数(1.34)は以下のように書ける。
+
+$Q(\lambda',\lambda) = \sum_{i=1}^NP(O,q_1=i|\lambda')log\pi_i$ (1.37)
+$ + \sum_{i=1}^N\sum_{j=1}^N\sum_{t=1}^{T-1}P(O,q_t=i,q_{t+1}=j|\lambda')\log{a_{ij}}$ (1.38)
+$ + \sum_{i=1}^N\sum_{t=1}^TP(O,q_t=i|\lambda)\log\mathcal{N}(o_t,\mu_{q_t},\Sigma_{q_t})$ (1.39)
+
+$1 \le i \le N$に対して確率の制約$\sum_{i=1}^N\pi_i = 1$と$\sum_{j=1}^Na_{ij} = 1$を受けながら、上のQ関数を最大化するパラメーターセット$\lambda$は式(1.37)-(1.38)と偏微分式(1.39)のラグランジュ乗数法で解くことができる。
+
+$\pi_i = \gamma_1(i)$,
+
+$a_{ij} = \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}$,
+
+$\mu_i = \frac{\sum_{t=1}^{T}\gamma_t(i)o_t}{\sum_{t=1}^{T}\gamma_t(i)}$,
+
+$\Sigma_i = \frac{\sum_{t=1}^{T}\gamma_t(i)(o_t - \mu_i)(o_t-\mu_i)^{\top}}{\sum_{t=1}^{T}\gamma_t(i)}$,
+
+ここで$\gamma_t(i)$は時間tで状態iになる状態専有確率で、$\xi_t(i,j)$は時間tで状態iになり時間t+1で状態jになる状態専有確率である。
+
+$\gamma_t(i) = P(O,q_t=i|\lambda)$
+$ = \frac{\alpha_t(i)\beta_t(i)}{\sum_{j=1}^N\alpha_t(j)\beta_t(j)}$
+
+$\xi_t(i,j) = P(O,q_t=i,q_{t+1}=j|\lambda)$
+$ = \frac{\alpha_t(i)a_{ij}b_j(o_{t+1})\beta_{t+1}(j)}{\sum_{l=1}^N\sum_{n=1}^N\alpha_t(l)a_{ln}b_n(o_{t+1})\beta_{t+1}(n)}$
+
+
+
+# Chapter 2 HMM-Based Speech Synthesis
 
 
