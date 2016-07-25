@@ -65,7 +65,7 @@ $P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t, o_{t+1}, ..., o_T, q_t = i|\lambd
 
 $P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|o_1,o_2,...,o_t,q_t=i,\lambda)$ //乗法定理
 
-$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$ //$o_{t+1},...,o_T$は$o_1,o_2,...,o_t$と独立
+$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$ (1.14) //$o_{t+1},...,o_T$は$o_1,o_2,...,o_t$と独立
 
 ゆえに観測列の確率(1.13)はフォワード・バックワード確率をつかって効率的に計算できる。
 
@@ -249,23 +249,44 @@ $ + \sum_{i=1}^N\sum_{t=1}^TP(O,q_t=i|\lambda)\log\mathcal{N}(o_t,\mu_{q_t},\Sig
 
 $1 \le i \le N$に対して確率の制約$\sum_{i=1}^N\pi_i = 1$と$\sum_{j=1}^Na_{ij} = 1$を受けながら、上のQ関数を最大化するパラメーターセット$\lambda$は式(1.37)-(1.38)と偏微分式(1.39)のラグランジュ乗数法で解くことができる。
 
-$\pi_i = \gamma_1(i)$,
+$\sum_{t=1}^{T-1}\gamma_t(i)$ //すべての時間にわたる観測列Oの中で状態iを訪れる回数＝状態iから遷移する回数,
 
-$a_{ij} = \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}$,
+$\sum_{t=1}^{T-1}\xi_t(i,j)$ //すべての時間にわたる観測列Oの中で状態iから状態jに遷移する回数,
+
+$\pi_i = \gamma_1(i)$ //時間t=1の時に状態iになる回数,
+
+$a_{ij} = \frac{状態iから状態jに遷移する回数}{状態iから遷移する回数}$
+$ = \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}$,
 
 $\mu_i = \frac{\sum_{t=1}^{T}\gamma_t(i)o_t}{\sum_{t=1}^{T}\gamma_t(i)}$,
 
 $\Sigma_i = \frac{\sum_{t=1}^{T}\gamma_t(i)(o_t - \mu_i)(o_t-\mu_i)^{\top}}{\sum_{t=1}^{T}\gamma_t(i)}$,
 
-ここで$\gamma_t(i)$は時間tで状態iになる状態専有確率で、$\xi_t(i,j)$は時間tで状態iになり時間t+1で状態jになる状態専有確率である。
+ここで$\gamma_t(i)$は時間tで状態iになる個々の状態専有確率で、$\xi_t(i,j)$は時間tで状態iになり時間t+1で状態jになる状態専有確率である。
 
-$\gamma_t(i) = P(O,q_t=i|\lambda)$
-$ = \frac{\alpha_t(i)\beta_t(i)}{\sum_{j=1}^N\alpha_t(j)\beta_t(j)}$
+$\gamma_t(i) = P(q_t=i|O,\lambda)$
 
-$\xi_t(i,j) = P(O,q_t=i,q_{t+1}=j|\lambda)$
+$ = \frac{P(O,q_t=i)|\lambda}{P(O|\lambda)}$ //乗法定理
+
+$ = \frac{P(O,q_t=i|\lambda)}{\sum_{j=1}^NP(O,q_t=j|\lambda)}$ //加法定理
+
+$ = \frac{\alpha_t(i)\beta_t(i)}{\sum_{j=1}^N\alpha_t(j)\beta_t(j)}$ //$P(O,q_t=i|\lambda) = \alpha_t(i)\beta_t(i)$ *
+
+
+$\xi_t(i,j) = P(q_t=i,q_{t+1}=j|O,\lambda)$
+$ = \frac{P(q_t=i, q_{t+1}=j,O|\lambda)}{P(O|\lambda)}$ //乗法定理
+$ = \frac{\alpha_t(i)a_{ij}b_j(o_{t+1})\beta_{t+1}(j)}{P(O|\lambda)}$
 $ = \frac{\alpha_t(i)a_{ij}b_j(o_{t+1})\beta_{t+1}(j)}{\sum_{l=1}^N\sum_{n=1}^N\alpha_t(l)a_{ln}b_n(o_{t+1})\beta_{t+1}(n)}$
 
 
+
+\* $P(O|\lambda) = \sum_{i=1}^NP(O, q_t = i|\lambda)$ (1.48)
+
+$P(O|\lambda) = \sum_{i=1}^NP(o_1,o_2,...,o_t,q_t=i|\lambda)P(o_{t+1},...,o_T|q_t=i,\lambda)$
+
+$P(O|\lambda) = \sum_{i=1}^N\alpha_t(i)\beta_t(i)$ (1.49)
+
+式(1.48)と(1.49)の$\sum$の中身を比較すると、$P(O,q_t=i|\lambda) = \alpha_t(i)\beta_t(i)$
 
 # Chapter 2 HMM-Based Speech Synthesis
 
