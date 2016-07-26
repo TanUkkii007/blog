@@ -1,5 +1,7 @@
 An Introduction to HMM-Based Speech Synthesis
 
+Junichi Yamagishi
+
 
 # Chapter 1 The Hidden Markov Model
 
