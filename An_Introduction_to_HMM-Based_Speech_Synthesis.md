@@ -292,4 +292,36 @@ $P(O|\lambda) = \sum_{i=1}^N\alpha_t(i)\beta_t(i)$ (1.49)
 
 # Chapter 2 HMM-Based Speech Synthesis
 
+この章ではHMMベースのtext-to-speech合成(TTS)システムを解説する。HMMベースの音声合成では、スペクトル、基本周波数（F0）、音素継続長などのスピーチパラメーターは最尤推定に基づくHMMでモデリングされ生成される。この章ではHMMベースのTTSシステムについて構造とアルゴリズムを簡潔に説明する。
+
+## 2.1 Parameter Generation Algorithm
+
+### 2.1.1 Formulation of the Problem
+
+最初に、最尤推定という意味でHMMから最適な音声パラメーターを直接生成するアルゴリズムを説明する。連続分布を使い長さTのパラメーター列を生成するHMM $\lambda$が与えられた時、HMMからスピーチパラメーターを生成する問題は$P(O|\lambda,T)$をOに関して最大化するスピーチパラメーター列$O=(o_1,o_2,...,o_T)$を得ることである。
+
+$O* = \arg\max_OP(O|\lambda,T)$
+$ = \arg\max_O\sum_qP(O,q|\lambda,T)$ //加法定理
+
+閉形式で$P(O|\lambda,T)$を最大化するスピーチパラメーター列を解析的に得る方法はないため、Viterbiアルゴリズムと似た方法でもっともとりうる状態列をつかって推定する。
+
+$O^* = \arg\max_OP(O|\lambda,T)$
+$ = \arg\max_O\sum_qP(O,q|\lambda,T)$
+$ \simeq \arg\max_O \max_qP(O,q|\lambda,T)$
+
+ベイズの定理を使って、Oとqの同時確率は以下のように簡潔に書ける。
+
+$O^* \simeq \arg\max_O \max_qP(O,q|\lambda,T)$
+$ = \arg\max_O\max_qP(O|q,\lambda,T)P(q|\lambda,T)$ //乗法定理
+
+よって、長さTとHMM $\lambda$が与えられた時の観測列Oの確率の最適化問題は２つの最適化問題に分割できる。
+
+$q^* = \arg\max_qP(q|\lambda,T)$
+
+$O^* = \arg\max_OP(O|q^*,\lambda,T)$
+
+もしフレームtの時のパラメーターベクトルが前後のフレームと独立に決定できるなら、$P(O|q^*,\lambda,T)$を最大化するスピーチパラメーター列Oは与えられた最適な状態列$q^*$での平均ベクトル列として得られる。これは生成されたスペクトルにおいて状態遷移時に不連続を引き起こし、カチッという音が合成音声に入り品質を悪化させる。これを避けるために、スピーチパラメーターベクトル$o_t$はM次元の静的特徴ベクトル$c_t = [c_t(1),c_t(2),...,c_t(M)]^\top$（例えばケプストラム係数）とM次元の動的特徴ベクトル$\Delta c_t, \Delta^2c_t$（例えばケプストラム係数のデルタとデルタデルタ）から成る、つまり$o_t = [c_t^\top,\Delta c_t^\top,\Delta^2c_t^\top]^\top$と仮定し、動的特徴ベクトルは現在のフレームの前後のフレームの静的特徴ベクトルを線形に組み合わせて決められるとする。
+
+
+
 
