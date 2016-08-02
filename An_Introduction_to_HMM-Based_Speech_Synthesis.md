@@ -328,4 +328,37 @@ $\Delta^{(n)}c_t = \sum_{\tau=-L_-^{(n)}}^{L_+^{(n)}}w_{t+\tau}^{(n)}c_t$ $0 \le
 
 ### 2.1.2 Solution for the Optimization Problem O∗
 
+まず、最適な状態列$q^*$が与えられたときの$O^*$の最適化問題の解法を説明する。スピーチパラメーターベクトル列Oはベクトル形式$O = [o_1^\top,o_2^\top,...,o_T^\top]$に書き換えられる。つまり、Oはすべてのパラメーターベクトルからなる超ベクトルである。同様にCは$C = [c_1^\top,c_2^\top,...,c_T^\top]$に書き換えられる。よって、$O = WC$というようにOはCで表すことができる。ここで、
 
+$W = [w_1,w_2,...,w_T]^\top$
+
+$w_t = [w_t^{(0)},w_t^{(1)},w_t^{(2)}]$
+
+$w_t^{(n)} = [0_{M\times M},...,0_{M\times M},$
+$  w^{(n)}(-L_-^{(n)})I_{M\times M}, ..., w^{(n)}I_{M\times M}, ..., w^{(n)}(L_+^{(n)})I_{M\times M},$
+$  0_{M\times M},...,0_{M\times M}]^\top$ $n = 0,1,2$
+
+$0_{M\times M}$は$M \times M$のゼロ行列で、$I_{M \times M}$は$M \times M$の単位行列だ。$t < 1, T < t$のとき$c_t = 0_M$と仮定している。$0_M$はM次元のゼロベクレルだ。$P(O|q^*,\lambda,T)$は以下のように書ける。
+
+$P(O|q^*,\lambda,T) = P(WC|q^*,\lambda,T)$
+
+$ = \frac{1}{\sqrt{(2\pi)^{3MT}|\Sigma|}}exp(-\frac{1}{2}(WC - \mu)^\top\Sigma^{-1}(WC - \mu))$
+
+ここで$\mu = [\mu_{q_1^*}^\top,\mu_{q_2^*}^\top,...,\mu_{q_T^*}^\top]^\top$、$U = diag[U_{q_1^*},U_{q_2^*},...,U_{q_T^*}]$、$\mu_{q_t^*}$は最適状態列$q^*$の状態$q_t$の平均ベクトル、$U_{q_t^*}$は最適状態列$q^*$の状態$q_t$の共分散行列の対角成分である。よって
+
+$\frac{\partial P(O|q^*,\lambda,T)}{\partial C} = 0_{TM \times 1}$
+
+とおくことによって、以下の方程式が得られる。
+
+$RC = r$ (2.17)
+
+ここで$TM \times TM$次元の行列RとTM次元のベクトルrは以下のとおりである。
+
+$R = W^\top U^{-1}W$
+
+$r = W^\top U^{-1}\mu$
+
+式(2.17)を解くことで、$P(O|q^*,\lambda,T)$を最大化するスピーチパラメーター列Cが得られる。Rの特殊な構造を利用して、式(2.17)はコレスキー分解あるいはQR分解で効率的に解くことができる。
+
+
+### 2.1.3 Solution for the Optimization Problem q∗
