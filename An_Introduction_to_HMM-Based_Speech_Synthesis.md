@@ -430,4 +430,25 @@ Fig. 23はFig. 2.2と同じ条件で生成した一連のスペクトルであ�
 
 ### 3.2.1 Spectral Model
 
-
+メルケプストラム解析では、声道伝達関数$H(z)$はMオーダーのメルケプストラム係数$c = [c(0),c(1),...,c(M)]^\top$によっていかのようにモデリングされる。
+
+$H(z) = exp(c^\top z)$$ = exp\sum_{m=0}^Mc(m)z^{-m}$ここで$z = [1,z^{-1},...,z^{-M}]^\top$。
+システム$z^{-1}$はfirst order all-pass関数によって定義される。
+
+$z^{-1} = \frac{z^{-1}-\alpha}{1-\alpha z^{-1}}$ $|\alpha| < 1$
+
+そしてwrapped frequency scale$\beta(\omega)$はphase responseとして与えられる。
+
+$\beta(\omega) = tan^{-1}\frac{1-\alpha^2sin\omega}{(1+\alpha^2)cos\omega-2\alpha}$
+
+phase response$\beta(\omega)$は適切な$\alpha$を選択すると聴覚周波数スケールのよい推定となる。表3.1はいくつかのサンプリングレートでの聴覚周波数スケールの推定のための$\alpha$の例である。frequency　wrappingの例をFig. 3.2に示す。図ではサンプリングレートが16kHzの場合、phase response $\beta(\omega)$は$\alpha=0.42$に対してメルスケールのよい推定となる。
+
+Table 3.1: Examples of α for approximating auditory frequency scales.
+
+|Sampling frequency|8kHz|10kHz|12kHz|16kHz|
+|:----------------:|:--:|:---:|:---:|:---:|
+|Mel scale         |0.31|0.35 |0.37 |0.42 |
+|Bark scale        |0.42|0.47 |0.50 |0.55 |
+
+
+### 3.2.2 Spectral Criterion
