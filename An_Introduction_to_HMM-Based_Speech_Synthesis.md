@@ -432,10 +432,10 @@ Fig. 23はFig. 2.2と同じ条件で生成した一連のスペクトルであ�
 
 メルケプストラム解析では、声道伝達関数$H(z)$はMオーダーのメルケプストラム係数$c = [c(0),c(1),...,c(M)]^\top$によっていかのようにモデリングされる。
 
-$H(z) = \exp(c^\top z)$$ = \exp\sum_{m=0}^Mc(m)z^{-m}$ (3.3)ここで$z = [1,z^{-1},...,z^{-M}]^\top$。
+$H(z) = \exp(c^\top \tilde{z})$$ = \exp\sum_{m=0}^Mc(m)z^{-m}$ (3.3)ここで$\tilde{z} = [1,\tilde{z}^{-1},...,\tilde{z}^{-M}]^\top$。
 システム$z^{-1}$はfirst order all-pass関数によって定義される。
 
-$z^{-1} = \frac{z^{-1}-\alpha}{1-\alpha z^{-1}}$ $|\alpha| < 1$
+$\tilde{z}^{-1} = \frac{z^{-1}-\alpha}{1-\alpha z^{-1}}$ $|\alpha| < 1$
 
 そしてwrapped frequency scale$\beta(\omega)$はphase responseとして与えられる。
 
@@ -478,7 +478,7 @@ $K=\exp\alpha^\top c$
 $ = \exp\sum_{m=0}^M(-\alpha)^mc(m)$
 
 $D(z) = \exp c_1^\top z$
-$ = \exp\sum_{m=1}c_1(m)z^{-m}$
+$ = \exp\sum_{m=1}c_1(m)\tilde{z}^{-m}$
 
 $\alpha = [1,(-\alpha),(-\alpha)^2,...,(-\alpha)^M]^\top$
 
@@ -486,7 +486,17 @@ $c_1 = [c_1(0),c_1(1),...,c_1(M)]^\top$
 
 係数cと$c_1$の関係は、
 
-$c_1(m) = $
+$
+c_1(m) = 
+\left\{
+\begin{array}{ll}
+c(0) - \alpha^\top c & m=0 \\
+c(m) & 1\le m\le M
+\end{array}
+\right.
+$
+
+
 $ c(0) - \alpha^\top c$ $m=0$
 $c(m)$ $1\le m\le M$
 
@@ -512,9 +522,128 @@ $K=\sqrt{\epsilon_{\min}}$
 
 ## 3.3 Synthesis Filter
 
+メルケプストラム係数からスピーチを合成するには、指数伝達関数$D(z)$を実現する必要がある。伝達関数$D(z)$は有理関数ではないが、MLSA(Mel Log Spectral Approximation)フィルターは十分な精度で$D(z)$を推定できる。
 
+複素指数関数$\exp\omega$は有理関数で近似できる。
 
+$\exp\omega \simeq R_L(\omega) = \frac{1+\sum_{l=1}^L A_{L,l}\omega^l}{1+\sum_{l=1}^L A_{L,l}(-\omega)^l}$ (3.21)
 
+たとえば、$A_{L,l} (l=1,2,...,L)$は以下のように選ぶ。
 
+$A_{L,l} = \frac{1}{l!}\begin{pmatrix}L \\
+l\end{pmatrix}/\begin{pmatrix}2L \\
+l\end{pmatrix}$
 
+式(3.21)は$\omega = 0$のときの$\exp \omega$の[L/L]Pade推定である。ゆえに$D(z)$は以下のように近似できる。
 
+$D(z) = \exp F(z) \simeq R_L(F(z))$
+
+ここで
+
+$F(z) = z^\top c_1 = \sum_{m=0}^M c_1(m)z^{-m}$
+
+$A_{L,l}(l=1,2,...,L)$は定数に対し、$c_1(m)$は変数であることに注意。
+
+$F(z)$からdelay-freeループを取り除くために、式(3.24)を以下のように修正する。
+
+$F(z) = z^\top c_1$
+$ = z^\top AA^{-1}c_1$
+$ = \Phi^\top b$
+$ = \sum_{m=1}^M b(m)\Phi_m(z)$
+
+ここで、
+
+$
+A = 
+\left(
+\begin{array}{ccccc}
+1 & \alpha & 0 & \cdots & 0 \
+0 & 1 & \alpha & \ddots & \vdots \
+0 & 0 & 1 & \ddots & 0\
+\vdots & \ddots & \ddots & \ddots & \alpha \
+0 & \cdots & \cdots & 0 & 1
+\end{array}
+\right)
+$
+
+$
+A^{-1} = 
+\left(
+\begin{array}{ccccc}
+1 & (-\alpha) & (-\alpha)^2 & \cdots & (-\alpha)^M \\
+0 & 1 & (-\alpha) & \ddots & \vdots \\
+0 & 0 & 1 & \ddots & (-\alpha)^2 \\
+\vdots & \ddots & \ddots & \ddots & (-\alpha) \\
+0 & \cdots & \cdots & 0 & 1
+\end{array}
+\right)
+$
+
+ベクトル$\Phi$は以下のように与えられる。
+
+$\Phi = A^\top z$
+$ = [1,\Phi_1(z),\Phi_2(z),...,\Phi_M(z)]^\top$
+
+ここで、
+
+$\Phi_m(z) = \frac{(1-\alpha^2)z^{-1}}{1-\alpha z^{-1}}z^{-(m-1)}$ $m \ge 1.$
+
+係数bは変換をつかって$c_1$から得ることができる。
+
+$b = A^\top c_1$ (3.34)
+$ = [0,b(1),b(2),...,b(M)]^T$
+
+式(3.34)の行列変換は再帰式に置き換えられる。
+
+$
+b(m) = \left\{
+\begin{array}{ll}
+c_1(M), & m = M \\
+c_1(m) - \alpha b(m+1), & 0 \le m \le M-1
+\end{array}
+\right.
+$
+
+bの最初の要素は以下の制約により０なので、
+
+$\alpha^\top c_1 = 0$
+
+$F(z)$のインパルス応答の値は時間０のとき０である。つまり$F(z)$はdelay-free pathをもっていない。
+
+Fig 3.4はMLSAフィルター$R_L(F(z)) \simeq D(z)$のブロックダイアグラムを示す。伝達関数$F(z)$はdelay−freeなパスを持っていないので、$R_L(F(z))$にはdelay−freeなループはなく、つまり$R_L(F(z))$は信頼性がある。
+
+もし$b(1),b(1),...,b(M)$が有界なら、$|F(e^{j\omega})|$も有界であり、以下の様な正の有限値が存在する。
+
+$\max_\omega|F(e^{i\omega})| < r$
+
+係数$A_{L,l}$は複素Chebyshev推定をつかって絶対誤差の最大値$\max_{|\omega|=r}|E_L(\omega)|$を最小化するよう最適化できる。ここで、
+
+$E_L(\omega) = \log(\exp\omega)-\log(R_L(\omega))$
+
+$L=5, r = 6.0$で得られた係数を表3.2に示す。$|F(e^{j\omega})|<r = 6.0$のとき、log近似誤差
+
+$|E_LF(e^{j\omega})|=|\log(D(e^{j\omega}))-\log R_5(F(e^{j\omega}))|$
+
+は0.2735dBを超えない。$L=4, r=4.5$に最適化した係数も表3.3に示す。この場合、log近似誤差は$|F(e^{j\omega})|<r = 4.5$の場合0.24dBを超えない。
+
+$F(z)$が以下のように表現されるとき、
+
+$F(z) = F_1(z) + F_2(z)$
+
+指数伝達関数はFig. 3.5に示すように以下のように近似される。
+
+$D(z) = \exp F(z)$
+$ = \exp F_1(z)\exp F_2(z)$
+$ \simeq R_L(F_1(z))R_L(F_2(z))$
+
+もし
+
+$\max_{\omega}|F_1(e^{j\omega})|,\max_{\omega}|F_2(e^{j\omega})|< \max_{\omega}|F(e^{j\omega})|$
+
+ならば、
+
+$R_L(F_1(e^{j\omega}))R_L(F_2(e^{j\omega}))$は$R_L(F(e^{j\omega}))$より$D(e^{j\omega})$をより正確に近似できる。あとのセクションの実験では、以下の関数が適用されている。
+
+$F_1(z) = b(1)\Phi_1(z)$
+
+$F_2(z) = \sum_{m=2}^M b(m)\Phi_m(z)$
