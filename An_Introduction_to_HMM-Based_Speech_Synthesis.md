@@ -432,7 +432,7 @@ Fig. 23はFig. 2.2と同じ条件で生成した一連のスペクトルであ�
 
 メルケプストラム解析では、声道伝達関数$H(z)$はMオーダーのメルケプストラム係数$c = [c(0),c(1),...,c(M)]^\top$によっていかのようにモデリングされる。
 
-$H(z) = exp(c^\top z)$$ = exp\sum_{m=0}^Mc(m)z^{-m}$ここで$z = [1,z^{-1},...,z^{-M}]^\top$。
+$H(z) = \exp(c^\top z)$$ = \exp\sum_{m=0}^Mc(m)z^{-m}$ (3.3)ここで$z = [1,z^{-1},...,z^{-M}]^\top$。
 システム$z^{-1}$はfirst order all-pass関数によって定義される。
 
 $z^{-1} = \frac{z^{-1}-\alpha}{1-\alpha z^{-1}}$ $|\alpha| < 1$
@@ -452,3 +452,69 @@ Table 3.1: Examples of α for approximating auditory frequency scales.
 
 
 ### 3.2.2 Spectral Criterion
+
+対数スペクトルの不偏推定(UELS)では、相対的なパワーに対して不偏であるパワースペクトル推定$|H(e^{j\omega})|^2$は以下の基準Eが最小化される方法で得ることができる。
+
+$E=\frac{1}{2\pi}\int_{-\pi}^{\pi}(expR(\omega)-R(\omega)-1)d\omega$ (3.6)
+
+ここで、
+
+$R(\omega) = \log I_N(\omega)-\log|H(e^{j\omega})|^2$
+
+そして$I_N(\omega)$はweekly stationary process$x(n)$のモデリングされたピリオドグラムで、以下のように与えられる。
+
+$I_N(\omega)=\frac{|\sum_{n=0}^{N-1}\omega(n)x(n)e^{-j\omega n}|^2}{\sum_{n=0}^{N-1}\omega^2(n)}$
+
+
+ここで$\omega(n)$は長さNのウィンドウである。式(3.6)の基準は通常のstationary ARプロセスの最尤推定と同じ形式であることは注目に値する。
+
+式(3.6)の基準はあらゆる特定のスペクトルモデルの推測なしに導かれているので、式(3.3)のスペクトルモデルにも適用可能である。式(3.3)の$H(z)$からgain factor Kを取り出すことで、
+
+$H(z) = K D(z)$
+
+ここで
+
+$K=\exp\alpha^\top c$
+$ = \exp\sum_{m=0}^M(-\alpha)^mc(m)$
+
+$D(z) = \exp c_1^\top z$
+$ = \exp\sum_{m=1}c_1(m)z^{-m}$
+
+$\alpha = [1,(-\alpha),(-\alpha)^2,...,(-\alpha)^M]^\top$
+
+$c_1 = [c_1(0),c_1(1),...,c_1(M)]^\top$
+
+係数cと$c_1$の関係は、
+
+$c_1(m) = $
+$ c(0) - \alpha^\top c$ $m=0$
+$c(m)$ $1\le m\le M$
+
+もしシステム$H(z)$がスピーチの合成フィルターと考えられるなら、$D(z)$は安定である。よって$D(z)$は以下の関係がある最小フェーズのシステムである。
+
+$\frac{1}{2\pi}\int_{-\pi}^\pi\log|H(e^{i\omega})|^2d\omega=\log K^2$
+
+上記の式を使って、式(3.6)nおスペクトル基準は以下のようになる。
+
+$E = \epsilon/K^2-\frac{1}{2\pi}\int_{-\pi}^\pi\log I_N(\omega)d\omega+\log K^2-1$
+
+ここで、
+
+$\epsilon=\frac{1}{2\pi}\int_{-\pi}^\pi\frac{I_N(\omega)}{|D(e^{j\omega})|^2}d\omega$ (3.19)
+
+よって定数項を省略すると、cに対するEの最小化は、$c_1$に対する$\epsilon$の最小化となり、Kに対するEの最小化となる。Kに対するEの微分をとり結果を０とおくと、Kは以下のように得られる。
+
+$K=\sqrt{\epsilon_{\min}}$
+
+ここで$\epsilon_{\min}$は$\epsilon$の最小値である。式(3.19)の最小化はFig 3.3に示すようにresidual energyの最小化となる。
+
+基準Eはcに対して凸なので唯一の最小値がある。ゆえにEの最小化はFFTと再帰式にもとづくアルゴリズムで効率的に解ける。さらに、モデル解$H(z)$の安定性はつねに保証される。
+
+## 3.3 Synthesis Filter
+
+
+
+
+
+
+
