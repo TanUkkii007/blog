@@ -430,9 +430,9 @@ Fig. 23はFig. 2.2と同じ条件で生成した一連のスペクトルであ�
 
 ### 3.2.1 Spectral Model
 
-メルケプストラム解析では、声道伝達関数$H(z)$はMオーダーのメルケプストラム係数$c = [c(0),c(1),...,c(M)]^\top$によっていかのようにモデリングされる。
+メルケプストラム解析では、声道伝達関数$H(z)$はMオーダーのメルケプストラム係数$c = [c(0),c(1),...,c(M)]^\top$によって以下のようにモデリングされる。
 
-$H(z) = \exp(c^\top \tilde{z})$$ = \exp\sum_{m=0}^Mc(m)z^{-m}$ (3.3)ここで$\tilde{z} = [1,\tilde{z}^{-1},...,\tilde{z}^{-M}]^\top$。
+$H(z) = \exp(c^\top \tilde{z})$$ = \exp\sum_{m=0}^Mc(m)\tilde{z}^{-m}$ (3.3)ここで$\tilde{z} = [1,\tilde{z}^{-1},...,\tilde{z}^{-M}]^\top$。
 システム$z^{-1}$はfirst order all-pass関数によって定義される。
 
 $\tilde{z}^{-1} = \frac{z^{-1}-\alpha}{1-\alpha z^{-1}}$ $|\alpha| < 1$
@@ -581,7 +581,7 @@ $
 
 ベクトル$\Phi$は以下のように与えられる。
 
-$\Phi = A^\top z$
+$\Phi = A^\top \tilde{z}$
 $ = [1,\Phi_1(z),\Phi_2(z),...,\Phi_M(z)]^\top$
 
 ここで、
@@ -633,6 +633,7 @@ $F(z) = F_1(z) + F_2(z)$
 指数伝達関数はFig. 3.5に示すように以下のように近似される。
 
 $D(z) = \exp F(z)$
+$ = \exp(F_1(z) + F_2(z))$
 $ = \exp F_1(z)\exp F_2(z)$
 $ \simeq R_L(F_1(z))R_L(F_2(z))$
 
