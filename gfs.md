@@ -34,7 +34,7 @@
 
 ### 2.2 Interface
 
-- reate
+- create
 - delete
 - open
 - close
