@@ -64,7 +64,7 @@ auto-downの危険性をよく理解するためにはリーダーがどのよ�
  * 実際にはUpやLeavingなメンバーが優先的にリーダーになれるにすぎない。他の状態でもリーダーになれる。実際のコードは以下を参照。
  * https://github.com/akka/akka/blob/v2.4.10/akka-cluster/src/main/scala/akka/cluster/Gossip.scala#L190-L196
  */
-reachableMembers.filter(m => m.status == Up || m.status == Leaving).map(_.address).min(Member.addressOrdering)
+val leader = reachableMembers.filter(m => m.status == Up || m.status == Leaving).map(_.address).min(Member.addressOrdering)
 ```
 
 この決定方法ではunreachableなメンバーがいない場合、つまりゴシップが収束しているときにクラスター内でリーダーをユニークに決定できます。しかしunreachableなメンバーが存在すると、メンバーによってどのメンバーがunreachableに見えるのかが異なるため、メンバーによって異なるリーダーを決定する場合があります。例えばネットワーク分断によりクラスターが２つに分断された場合、リーダーは２つできます。各リーダーが相手側をdownするので、split brain状態になります。Akka Clusterのリーダー選出はどのような状況でも可能で可用性が高い代わりに、整合性を犠牲にしています。これは整合性を取っているPaxosやRaftなどの分散合意プロトコルと異なる点です。
@@ -75,9 +75,36 @@ split brain問題に対処するためにはいくつかの観点があり、そ
 
 - クラスターの中でリーダーよりももっと整合性の高い方法で決定でき、downを果たせるメンバーはいないでしょうか？
 - クラスターが２つに分割された場合、どちらが正しいクラスターなのでしょうか？
-- 正しくないクラスターを決めたとして、そのクラスターのメンバーはどうすべきでしょうか？
+- 正しくないクラスターを決めたとして、そのクラスターのメンバーをどうすべきでしょうか？
+
+split brain問題を様々な方法で解決するsplit brain resolverを紹介します。実装はLightbend社によるプロプライエタリなものと、私が作ったakka-cluster-custom-downingというオープンソース実装があります。
+
+split brain resolverのストラテジは以下があります。
+
+- keep reference
+- keep oldest
+- static quorum
+- keep majority
 
 
+そのうちいくつかのストラテジを紹介します。
+
+#### Keep Oldest
+
+Keep Oldestストラテジは、クラスターがネットワーク分断を起こしたときに、最古のメンバーがいる側を正のクラスターとします。そうでない側のメンバーは自らシャットダウンします。unreachableなメンバーをdownする役割は最古メンバーが担います。
+
+最古メンバーがどのように決まるのかを解説します。クラスターのメンバーは起動したときのタイムスタンプを持っています。状態がRemovedでないメンバーの中でこのタイムスタンプが最小のメンバーが最古メンバーです。
+
+```scala
+val oldest = members.filterNot(_.status == Removed).min(Member.ageOrdering)
+```
+
+リーダーとは異なり、最古メンバーはたとえgossipが収束していなくてもすべてのメンバーで一意に決まります。最古メンバーを基準にする限りsplit brainはおきません。
+
+Keep Oldestストラテジは可用性の点で問題があります。最古メンバーがクラッシュした場合、全クラスターメンバーがシャットダウンします。これを防ぐためには、`down-if-alone`オプションを有効にします。これにより最古メンバーのみがクラッシュした場合、代わりに最古メンバーがdownされます。これにより最古メンバーは次に古いメンバーに移り、フェイルオーバーが可能になります。
+
+
+#### Static Quorum
 
 
 ## オミッション（切り捨て）故障
