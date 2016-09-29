@@ -77,7 +77,7 @@ split brain問題に対処するためにはいくつかの観点があり、そ
 - クラスターが２つに分割された場合、どちらが正しいクラスターなのでしょうか？
 - 正しくないクラスターを決めたとして、そのクラスターのメンバーをどうすべきでしょうか？
 
-split brain問題を様々な方法で解決するsplit brain resolverを紹介します。実装はLightbend社によるプロプライエタリなものと、私が作ったakka-cluster-custom-downingというオープンソース実装があります。
+split brain問題を様々な方法で解決するsplit brain resolverを紹介します。実装はLightbend社によるプロプライエタリなものと、私が作ったakka-cluster-custom-downingというオープンソース実装があります。split brain resolverはAkka clusterを複数のDC環境で動作させる場合に必須になります。
 
 split brain resolverのストラテジは以下があります。
 
@@ -103,7 +103,7 @@ val oldest = members.filterNot(_.status == Removed).min(Member.ageOrdering)
 
 Keep Oldestストラテジは可用性の点で問題があります。最古メンバーがクラッシュした場合、全クラスターメンバーがシャットダウンします。これを防ぐためには、`down-if-alone`オプションを有効にします。これにより最古メンバーのみがクラッシュした場合、代わりに最古メンバーがdownされます。これにより最古メンバーは次に古いメンバーに移り、フェイルオーバーが可能になります。
 
-oldestメンバーから分断されてしまった側のメンバーは以下の２つを行わなければなりません。クライアントのリクエストからの隔離と、共有リソースからの隔離です。split brain resolverではプロセスを終了させています。
+oldestメンバーから分断されてしまった側のメンバーは以下の２つを行わなければなりません。クライアントのリクエストからの隔離と、共有リソースからの隔離です。split brain resolverではプロセスを終了させています。プロセスを終了させることは最も簡単な隔離で、考慮しなければならない故障はクラッシュストップ故障だけですみます。他のストラテジでも同様です。
 
 
 #### Static Quorum
