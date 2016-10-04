@@ -1,4 +1,4 @@
-Designing Akka Cluster Resilience
+Akka Clusterの耐障害性
 
 # Akka Clusterの適用領域
 
