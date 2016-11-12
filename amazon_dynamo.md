@@ -71,3 +71,49 @@ Fig.1はAmazon Platformの抽象的な図である。サービスは異なるス
 
 
 # 3. RELATED WORK
+
+## 3.1 Peer to Peer Systems
+
+第一世代。構造化されていないP2Pネットワーク。ピアと任意のリンクを張る。
+
+- Freenet
+- Gnutella
+
+有界のクエリーのホップ数
+
+- Pastry
+- Chord
+
+O1ルーティング。ローカルにルーティング情報をもつ。
+
+- Oceanstore
+- PAST
+
+
+## 3.2 Distributed File Systems and Databases
+
+整合性より可用性をとった分散ファイルシステム
+
+- Ficus
+- Coda
+
+中央サーバーのない分散ファイルシステム
+
+- Farsite
+
+マスターをもつシンプルな分散ファイルシステム
+
+- Google File System
+
+結果整合のRDB
+
+- Bayou
+
+このなかでBayou、Coda、Ficusは分断されたオペレーションに対応している。Coda、Ficusはシステムレベルのコンフリクト解決を行い、Bayouはアプリケーションレベルのコンフリクト解決を行う。
+
+Antiquityはセキュアログとビザンチン故障耐性プロトコルを使ったデータ完全性をもつWANストレージシステム。Dynamoにはセキュリティの機能はない。
+
+Bigtableは疎な多次元ソート済みマップを扱うストレージで、複数の属性のアクセスを可能にする。Dynamoはkey-valueアクセスしかない。
+
+## 3.3 Discussion
+
