@@ -149,6 +149,10 @@ Bigtableは疎な多次元ソート済みマップを扱うストレージで、
 
 ## 4.1 System Interface
 
+get()とput()の２つのインターフェイスがある。get(key)は１つの値あるいはコンフリクトした複数の値とcontextを返す。put(key, context, object)はkeyをもとにobjectを配置するレプリカを決め、永続化する。contextはobjectのバージョンなどのシステムのメタデータを有する。
 
+keyとobjectはバイト配列で扱う。keyはMD5ハッシュを適用し128bitの識別子を生成し、保存するノードを決めるのに使われる。
+
+## 4.2 Partitioning Algorithm
 
 
