@@ -8,3 +8,9 @@
 HBase Definitive Guide 2nd ed.
 Ch 8: Internal
 Seek Versus Transfer
+
+2016/11/30
+HBase Definitive Guide 2nd ed.
+Ch 8: Internal
+Storage
+Overview
