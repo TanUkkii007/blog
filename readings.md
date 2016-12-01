@@ -14,3 +14,8 @@ HBase Definitive Guide 2nd ed.
 Ch 8: Internal
 Storage
 Overview
+
+2016/12/1
+HBase Definitive Guide 2nd ed.
+Ch 8: Internal
+Write Path
