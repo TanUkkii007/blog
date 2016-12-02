@@ -19,3 +19,9 @@ Overview
 HBase Definitive Guide 2nd ed.
 Ch 8: Internal
 Write Path
+
+2016/12/2
+HBase Definitive Guide 2nd ed.
+Ch 8: Internal
+MemStore Flushes
+Synchronous Checks
